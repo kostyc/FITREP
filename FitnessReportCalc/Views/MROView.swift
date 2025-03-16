@@ -53,41 +53,60 @@ struct MROView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    addEntryButton
-                    draftReportsSection
-                    publishedReportsSection
-                    emptyStateSection
+            ZStack {
+                // Use the same gradient background as in ReportDetailView
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Theme.primaryBackgroundColor(for: colorScheme),
+                        Theme.secondaryBackgroundColor(for: colorScheme)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        addEntryButton
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Theme.controlBackgroundColor(for: colorScheme))
+                            )
+                        
+                        draftReportsSection
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                            )
+                        
+                        publishedReportsSection
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                            )
+                        
+                        emptyStateSection
+                    }
+                    .padding()
                 }
-                .padding()
+                .navigationTitle("MRO")
+                .background(Color.clear)
             }
-            .navigationTitle("MRO")
-            .background(Color.clear)
-            .applyBackgroundGradient(colorScheme)
             .sheet(isPresented: $showingAddReport) {
                 ReportEditorView(grade: "", onSave: { newReport in
                     profileManager.addReport(newReport)
                 })
-                .background(Color.clear)
-                .applyBackgroundGradient(colorScheme)
             }
             .sheet(item: $showingDetailReport) { report in
                 ReportDetailView(report: report, grade: report.grade, profileManager: profileManager)
-                .background(Color.clear)
-                .applyBackgroundGradient(colorScheme)
             }
             .sheet(item: $showingShareChart) { report in
                 SharePDFView(grade: report.grade, selectedReport: report, profileManager: profileManager)
-                .background(Color.clear)
-                .applyBackgroundGradient(colorScheme)
             }
             .sheet(item: $showingEditReport) { report in
                 ReportEditorView(report: report, grade: report.grade, onSave: { updatedReport in
                     profileManager.updateReport(updatedReport)
                 })
-                .background(Color.clear)
-                .applyBackgroundGradient(colorScheme)
             }
             .onAppear {
                 print("MROView appeared, total reports: \(allReports.count)")
@@ -103,10 +122,10 @@ struct MROView: View {
                 Image(systemName: "plus.circle.fill")
                     .foregroundColor(.blue)
                 Text("Add Entry")
+                    .foregroundColor(Theme.textColor(for: colorScheme))
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .cornerRadius(8)
         }
         .padding(.horizontal)
     }
@@ -117,22 +136,31 @@ struct MROView: View {
                 VStack(alignment: .center, spacing: 8) {
                     Text("Draft Reports")
                         .font(.title3.bold())
+                        .foregroundColor(Theme.textColor(for: colorScheme))
+                    
                     HStack(spacing: 8) {
                         Text("Grade")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("Name")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("Type")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("To Date")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
                     }
                     .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.1))
+                    .background(Theme.controlBackgroundColor(for: colorScheme))
                     .cornerRadius(4)
                     
                     ForEach(draftReports, id: \.id) { report in
@@ -151,7 +179,7 @@ struct MROView: View {
                 .padding(.horizontal)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray, lineWidth: 1)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                 )
             }
         }
@@ -164,6 +192,8 @@ struct MROView: View {
                     HStack(spacing: 4) {
                         Text("Published Reports for")
                             .font(.title3.bold())
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Picker("", selection: $selectedGradeFilter) {
                             Text("All Grades").tag("All Grades")
                             ForEach(gradeFilters, id: \.self) { grade in
@@ -180,21 +210,30 @@ struct MROView: View {
                         Text("Name")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("Type")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("End Date")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("MRO Avg")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
+                        
                         Text("RV")
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .foregroundColor(Theme.textColor(for: colorScheme))
                     }
                     .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.1))
+                    .background(Theme.controlBackgroundColor(for: colorScheme))
                     .cornerRadius(4)
                     
                     ForEach(filteredPublishedReports, id: \.id) { report in
@@ -202,14 +241,15 @@ struct MROView: View {
                             report: report,
                             dateFormatter: dateFormatter,
                             profileManager: profileManager,
-                            onTap: { showingDetailReport = report }
+                            onTap: { showingDetailReport = report },
+                            colorScheme: colorScheme
                         )
                     }
                 }
                 .padding(.horizontal)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray, lineWidth: 1)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                 )
             }
         }
@@ -220,7 +260,7 @@ struct MROView: View {
             if allReports.isEmpty {
                 Text("No reports available")
                     .font(.title2)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
                     .padding()
             }
         }
@@ -233,24 +273,34 @@ struct PublishedReportRow: View {
     let dateFormatter: DateFormatter
     let profileManager: RSProfileManager
     let onTap: () -> Void
+    let colorScheme: ColorScheme
     
     var body: some View {
         ZStack(alignment: .center) {
             HStack(spacing: 8) {
                 Text(report.name)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
+                
                 Text(report.type)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
+                
                 Text(dateFormatter.string(from: report.dueDate))
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
+                
                 Text(report.average != nil ? String(format: "%.2f", report.average!) : "N/A")
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
+                
                 Text(profileManager.relativeValue(for: report) != nil ? String(format: "%.2f", profileManager.relativeValue(for: report)!) : "N/A")
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .foregroundColor(Theme.textColor(for: colorScheme))
             }
             .font(.footnote)
             .padding(.vertical, 4)
-            .background(Color.gray.opacity(0.05))
+            .background(Theme.controlBackgroundColor(for: colorScheme).opacity(0.5))
             .cornerRadius(4)
         }
         .onTapGesture {

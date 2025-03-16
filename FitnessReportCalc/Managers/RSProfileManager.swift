@@ -150,16 +150,16 @@ class RSProfileManager: ObservableObject {
         let high = filteredAverages.max(by: { $0 < $1 }) ?? 0.0
         let low = filteredAverages.min(by: { $0 < $1 }) ?? 0.0
         let delta = high - low == 0.0 ? 1.0 : high - low
-        let relativeValues = Dictionary(uniqueKeysWithValues:
-            reports.map { report in
-                if report.attributes.allSatisfy { $0 == "N/O" } {
+        let relativeValues = Dictionary(uniqueKeysWithValues: (
+            reports.map({ report in
+                if report.attributes.allSatisfy({ $0 == "N/O" }) {
                     return (report.id, nil as Double?)
                 }
                 let position = report.average != nil ? (report.average! - avg) / delta : 0.0
                 let rv = 90.0 + 10.0 * position
                 return (report.id, min(100.0, max(80.0, rv)))
-            }
-        )
+            })
+        ))
         let rvList = relativeValues.values.compactMap { $0 }
         let rvAvg = rvList.isEmpty ? 0.0 : rvList.reduce(0, +) / Double(rvList.count)
         let rvHigh = rvList.max(by: { $0 < $1 }) ?? 0.0

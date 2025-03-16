@@ -30,7 +30,6 @@ class FITREPImporter {
         let actualScoringCount = (scoringCount >= 1 && scoringCount <= 14) ? scoringCount : defaultScoringCount
         
         let targetSum = round(avg * Double(actualScoringCount))
-        let targetAvg = targetSum / Double(actualScoringCount)
         
         if abs(avg - 3.0) < 0.001 {
             return Array(repeating: "C", count: actualScoringCount) + Array(repeating: "H", count: 14 - actualScoringCount)

@@ -52,17 +52,83 @@ struct LogbookView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    DashboardSection(filteredGrades: filteredGrades, publishedProfiles: publishedProfiles)
-                    DraftsSection(draftReports: profileManager.draftReports, dateFormatter: dateFormatter, showingDraftDetail: $showingDraftDetail, profileManager: profileManager)
-                    DueDatesSection(dueDates: DueDates.shared.dueDates, rankToGradeMap: rankToGradeMap, dateFormatter: dateFormatter)
+            ZStack {
+                // Use the same gradient background as in ReportDetailView
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Theme.primaryBackgroundColor(for: colorScheme),
+                        Theme.secondaryBackgroundColor(for: colorScheme)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        DashboardSection(filteredGrades: filteredGrades, publishedProfiles: publishedProfiles)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            )
+                        
+                        // Conditional display based on if there are draft reports
+                        if profileManager.draftReports.isEmpty {
+                            VStack(alignment: .center, spacing: 8) {
+                                Text("DRAFTS")
+                                    .font(.headline)
+                                    .foregroundColor(Theme.textColor(for: colorScheme))
+                                    .padding(.top, 12)
+                                
+                                Divider()
+                                    .background(Color.gray.opacity(0.3))
+                                    .padding(.horizontal)
+                                
+                                Text("No Drafts Available")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(Theme.textColor(for: colorScheme))
+                                    .padding()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            )
+                        } else {
+                            DraftsSection(draftReports: profileManager.draftReports, dateFormatter: dateFormatter, showingDraftDetail: $showingDraftDetail, profileManager: profileManager)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                                )
+                        }
+                            
+                        DueDatesSection(dueDates: DueDates.shared.dueDates, rankToGradeMap: rankToGradeMap, dateFormatter: dateFormatter)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.sectionBackgroundColor(for: colorScheme))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            )
+                    }
+                    .padding()
                 }
-                .padding()
+                .navigationTitle("Logbook")
+                .background(Color.clear)
             }
-            .navigationTitle("Logbook")
-            .background(Color.clear)
-            .applyBackgroundGradient(colorScheme)
             .refreshable {
                 refreshData()
             }

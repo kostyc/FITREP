@@ -18,73 +18,84 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Profile action buttons container
-                    VStack(spacing: 12) {
-                        // Import Files
-                        ActionButton(
-                            imageName: "square.and.arrow.down.fill",
-                            imageColor: .green,
-                            text: "Import Reports",
-                            action: {
-                                print("Import button clicked")
-                                isPresentingFileImporter = true
+            ZStack {
+                // Use the same gradient background as in ReportDetailView
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Theme.primaryBackgroundColor(for: colorScheme),
+                        Theme.secondaryBackgroundColor(for: colorScheme)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Profile action buttons container
+                        VStack(spacing: 12) {
+                            // Import Files
+                            ActionButton(
+                                imageName: "square.and.arrow.down.fill",
+                                imageColor: .green,
+                                text: "Import Reports",
+                                action: {
+                                    print("Import button clicked")
+                                    isPresentingFileImporter = true
+                                }
+                            )
+                            .fileImporter(
+                                isPresented: $isPresentingFileImporter,
+                                allowedContentTypes: [.pdf],
+                                allowsMultipleSelection: false
+                            ) { result in
+                                handleFileImport(result)
                             }
-                        )
-                        .fileImporter(
-                            isPresented: $isPresentingFileImporter,
-                            allowedContentTypes: [.pdf],
-                            allowsMultipleSelection: false
-                        ) { result in
-                            handleFileImport(result)
-                        }
 
-                        // Share App
-                        ActionButton(
-                            imageName: "square.and.arrow.up",
-                            imageColor: .blue,
-                            text: "Share App",
-                            action: {
-                                showingShareSheet = true
+                            // Share App
+                            ActionButton(
+                                imageName: "square.and.arrow.up",
+                                imageColor: .blue,
+                                text: "Share App",
+                                action: {
+                                    showingShareSheet = true
+                                }
+                            )
+                            .sheet(isPresented: $showingShareSheet) {
+                                ShareSheet(activityItems: [
+                                    "Check out the FITREP RS App to manage your Profile: ",
+                                    URL(string: "https://apps.apple.com/us/app/fitrep-rs/id6743132342")!
+                                ])
                             }
-                        )
-                        .sheet(isPresented: $showingShareSheet) {
-                            ShareSheet(activityItems: [
-                                "Check out the FITREP RS App to manage your Profile: ",
-                                URL(string: "https://apps.apple.com/us/app/fitrep-rs/id6743132342")!
-                            ])
-                        }
 
-                        // Clear Reports
-                        ActionButton(
-                            imageName: "trash.fill",
-                            imageColor: .red,
-                            text: "Clear All Reports",
-                            action: {
-                                showingClearConfirmation = true
-                                print("Clear button tapped")
-                            }
+                            // Clear Reports
+                            ActionButton(
+                                imageName: "trash.fill",
+                                imageColor: .red,
+                                text: "Clear All Reports",
+                                action: {
+                                    showingClearConfirmation = true
+                                    print("Clear button tapped")
+                                }
+                            )
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Theme.sectionBackgroundColor(for: colorScheme))
                         )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                     }
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(UIColor.systemBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
+                    .padding(.top, 8)
                 }
-                .padding(.top, 8)
+                .background(Color.clear)
+                .navigationTitle("Profile")
             }
-            .background(Color.clear)
-            .navigationTitle("Profile")
-            .applyBackgroundGradient(colorScheme)
         }
         .alert(isPresented: $profileManager.showingAlert) {
             Alert(title: Text("Error"), message: Text(profileManager.alertMessage), dismissButton: .default(Text("OK")))
@@ -139,6 +150,7 @@ struct ActionButton: View {
     let imageColor: Color
     let text: String
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
@@ -156,7 +168,7 @@ struct ActionButton: View {
                 
                 Text(text)
                     .font(.system(size: 17, weight: .medium))
-                    .foregroundColor(Color(UIColor.label))
+                    .foregroundColor(Theme.textColor(for: colorScheme))
                 
                 Spacer()
                 
@@ -169,7 +181,7 @@ struct ActionButton: View {
             .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(UIColor.secondarySystemBackground))
+                    .fill(Theme.controlBackgroundColor(for: colorScheme))
             )
         }
         .buttonStyle(PlainButtonStyle())
